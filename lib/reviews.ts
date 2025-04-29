@@ -11,6 +11,7 @@ interface CmsItem {
 export interface Review {
   slug: string;
   title: string;
+  subtitle: string;
   date: string;
   image: string;
 }
@@ -29,7 +30,7 @@ export async function getReviews(): Promise<Review[]> {
     fields: ['slug', 'title', 'subtitle', 'publishedAt'],
     populate: { image: { fields: ['url'] } },
     sort: ['publishedAt:desc'],
-    pagination: { pageSize: 100 }, 
+    pagination: { pageSize: 100 }, // Zwiększono pageSize, aby pobrać wszystkie recenzje
   });
   return data.map(toReview);
 }
@@ -76,6 +77,7 @@ function toReview(item: CmsItem): Review {
   return {
     slug: attributes.slug,
     title: attributes.title,
+    subtitle: attributes.subtitle,
     date: attributes.publishedAt.slice(0, 'yyyy-mm-dd'.length),
     image: CMS_URL + attributes.image.data.attributes.url,
   };
