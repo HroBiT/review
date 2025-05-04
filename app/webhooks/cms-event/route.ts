@@ -8,9 +8,7 @@ export async function POST(request: NextRequest) {
   try {
     const payload = await request.json();
 
-    // Sprawdź, czy model to 'review'
     if (payload.model === 'review') {
-      // Opcjonalnie: Wywołaj API na porcie 1337, aby pobrać dodatkowe dane
       const response = await fetch(`${API_URL}/api/reviews/${payload.entry.id}`, {
         method: 'GET',
         headers: {
@@ -26,7 +24,6 @@ export async function POST(request: NextRequest) {
       const reviewData = await response.json();
       console.log('Fetched review data:', reviewData);
 
-      // Revalidate cache for reviews
       revalidateTag(CACHE_TAG_REVIEWS);
       console.log('Revalidated cache for:', CACHE_TAG_REVIEWS);
     } else {
