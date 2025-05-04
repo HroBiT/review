@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import Heading from '@/components/Heading';
+import Heading from '@/app/Heading';
 import { getReviews } from '@/lib/reviews';
 import Image from 'next/image';
 
 export default async function HomePage() {
-  const reviews = await getReviews(25);
+  const  {reviews} = await getReviews(25);
   console.log('[HomePage] rendering', reviews);
 
   return (

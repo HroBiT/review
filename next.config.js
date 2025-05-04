@@ -2,16 +2,16 @@
 
 module.exports = {
 
-    experimental: {
-      staleTimes: {
-        dynamic: 60,
-      },
-    },
-    logging: {
-      fetches: {
-        fullUrl: true,
-      },
-    },
+    // experimental: {
+    //   staleTimes: {
+    //     dynamic: 60,
+    //   },
+    // },
+    // logging: {
+    //   fetches: {
+    //     fullUrl: true,
+    //   },
+    // },
 
     images: {
         remotePatterns: [

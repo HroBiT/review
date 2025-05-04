@@ -3,6 +3,11 @@ import qs from 'qs';
 
 const CMS_URL = process.env.NEXT_PUBLIC_STRAPI_URL ?? 'http://localhost:1337';
 
+export const CACHE_TAG_REVIEWS = 'reviews';
+
+export type SearchableReview = Pick<Review, 'slug' | 'title'>;
+
+
 interface CmsItem {
   id: number;
   attributes: any;
@@ -16,6 +21,11 @@ export interface Review {
   image: string;
 }
 
+export interface PaginatedReviews {
+  pageCount: number;
+  reviews: Review[];
+}
+
 export interface FullReview extends Review {
   body: string;
 }
@@ -26,15 +36,19 @@ export async function getFeaturedReview(): Promise<Review | null> {
   return reviews[0] ?? null;
 }
 
-export async function getReviews(pageSize: number = 6): Promise<Review[]> {
-  const { data } = await fetchReviews({
+export async function getReviews(pageSize: number, page?: number): Promise<PaginatedReviews> {
+  const { data, meta } = await fetchReviews({
     fields: ['slug', 'title', 'subtitle', 'publishedAt'],
     populate: { image: { fields: ['url'] } },
     sort: ['publishedAt:desc'],
-    pagination: { pageSize },
+    pagination: { pageSize, page },
   });
-  return Array.isArray(data) ? data.map(toReview).filter(Boolean) : [];
+  return {
+    pageCount: meta.pagination.pageCount,
+    reviews: data.map(toReview),
+  };
 }
+
 
 
 export async function getReview(slug: string): Promise<FullReview | null> {
@@ -52,7 +66,6 @@ export async function getReview(slug: string): Promise<FullReview | null> {
   };
 }
 
-// Pobiera listę slugów recenzji
 export async function getSlugs(): Promise<string[]> {
   const { data } = await fetchReviews({
     fields: ['slug'],
@@ -83,6 +96,22 @@ async function fetchReviews(parameters: any) {
   return await response.json();
 }
 
+export async function searchReviews(query: string, pageSize: number = 6): Promise<Review[]> {
+  const { data } = await fetchReviews({
+    filters: {
+      $or: [
+        { title: { $containsi: query } },
+        { subtitle: { $containsi: query } },
+      ],
+    },
+    fields: ['slug', 'title', 'subtitle', 'publishedAt'],
+    populate: { image: { fields: ['url'] } },
+    sort: ['publishedAt:desc'],
+    pagination: { pageSize },
+  });
+
+  return Array.isArray(data) ? data.map(toReview).filter(Boolean) : [];
+}
 
 function toReview(item: CmsItem): Review {
   const { attributes } = item;

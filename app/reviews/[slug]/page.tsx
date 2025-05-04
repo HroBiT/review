@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import Heading from '@/components/Heading';
+import Heading from '@/app/Heading';
 import ShareLinkButton from '@/components/ShareLinkButton';
 import { getReview, getSlugs } from '@/lib/reviews';
 import Image from 'next/image';
@@ -13,10 +13,12 @@ interface ReviewPageProps {
   params: ReviewPageParams;
 }
 
-// export async function generateStaticParams(): Promise<ReviewPageParams[]> {
-//   const slugs = await getSlugs();
-//   return slugs.map((slug) => ({ slug }));
-// }
+export const revalidate = 3600;
+
+export async function generateStaticParams(): Promise<ReviewPageParams[]> {
+  const slugs = await getSlugs();
+  return slugs.map((slug) => ({ slug }));
+}
 
 export async function generateMetadata({ params: { slug } }: ReviewPageProps): Promise<Metadata> {
   const review = await getReview(slug);
